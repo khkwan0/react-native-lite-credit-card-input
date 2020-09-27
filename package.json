@@ -1,0 +1,25 @@
+{
+  "name": "react-native-lite-credit-card-input",
+  "version": "20.9.27",
+  "description": "Minimal credit card input for React Native using React hooks",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native",
+    "credit",
+    "card",
+    "credit",
+    "card",
+    "input",
+    "input",
+    "card",
+    "component"
+  ],
+  "author": "khkwan0",
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.29.0"
+  }
+}
