@@ -87,7 +87,6 @@ const LiteCreditCardInput = props => {
       cvvLength = 4
     }
     const res = valid.cvv(cvv, cvvLength)
-    console.log(res)
     setCvvValidity({...res})
   }, [cvv])
 
@@ -105,7 +104,6 @@ const LiteCreditCardInput = props => {
         cvc: cvv
       }
     }
-    console.log(cvvValidity)
     if (numberValidity && numberValidity.isValid && expValidity && expValidity.isValid && cvvValidity && cvvValidity.isValid) {
       res.valid = true
     }
