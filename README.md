@@ -11,6 +11,8 @@ As of this writing, the previous module has not been updated in 3+ years and use
 
 This reimplementation is a standalone implementation using React hooks.
 
+<strong>The input area contains no default border.  You can add your own throught the <pre>style</pre> prop.  See example below.</strong>
+
 # Installation
 
 yarn add react-native-lite-credit-card-input
@@ -23,10 +25,13 @@ npm install react-native-lite-credit-card-input
 <table>
  <tr><th>Prop</th><th></th></tr>
  <tr><td>onChange</td><td>Returns a card object * see below</td></tr>
+ <tr><td>style</td><td>Override styles * see example below</td></tr>
 </table>
 
 # Usage
+<pre>
 import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
+</pre>
  
  card's structure:
  <pre>
@@ -40,3 +45,5 @@ import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
    }
  }
 </pre>
+
+# Example Code
