@@ -17,8 +17,11 @@
     "input",
     "component"
   ],
-  "author": "khkwan0",
+  "author": "khkwan0@github.com",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/khkwan0/react-native-lite-credit-card-input/issues"
+  },
   "dependencies": {
     "card-validator": "^8.1.0"
   }
