@@ -11,7 +11,7 @@ As of this writing, the previous module has not been updated in 3+ years and use
 
 This reimplementation is a standalone implementation using React hooks.
 
-<strong>The input area contains no default border.  You can add your own throught the <pre>style</pre> prop.  See example below.</strong>
+<strong>The input area contains no default border.  You can add your own via the style prop.  See example below.</strong>
 
 # Installation
 
