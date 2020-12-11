@@ -19,7 +19,7 @@ npm install react-native-lite-credit-card-input
 
 # Usage
 
-import LiteCreditCardInput from 'react-native-lite-credit-card-input'
+import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
 
 props:
  onChange(card) - required
