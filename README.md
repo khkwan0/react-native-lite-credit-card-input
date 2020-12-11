@@ -47,7 +47,7 @@ import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
 </pre>
 
 # Example Code
-<pre>
+```javascript
 import React from 'react'
 import {View, Text} from 'react-native'
 import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
@@ -67,4 +67,4 @@ const Example = props => {
 }
 
 export default Example
-</pre>
+```
