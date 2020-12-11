@@ -29,7 +29,7 @@ npm install react-native-lite-credit-card-input
 import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
  
  card's structure:
- 
+ <pre>
  {
    valid: boolean,
    type: string, // ('visa', 'american-express', et al.)
@@ -39,3 +39,4 @@ import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
      cvc: string, // 3 or 4 digit
    }
  }
+</pre>
