@@ -1,2 +1,2 @@
 import LiteCreditCardInput from './src/LiteCreditCardInput'
-export {LiteCreditCartInput}
+export {LiteCreditCardInput}
