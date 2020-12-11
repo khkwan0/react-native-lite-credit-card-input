@@ -21,6 +21,7 @@ or
 
 npm install react-native-lite-credit-card-input
 
+https://www.npmjs.com/package/react-native-lite-credit-card-input
 # Props
 <table>
  <tr><th>Prop</th><th></th></tr>
