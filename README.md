@@ -1,6 +1,8 @@
 # react-native-lite-credit-card-input
 Minimal credit card input for RN using React hooks.
 
+![Lite Credit Card Input Demo](demo/react-native-lite-credit-card-input.gif)
+
 Description:
 
 This module is a reimplementation of Lite Credit Card Input from https://github.com/sbycrosz/react-native-credit-card-input/tree/master/src.
