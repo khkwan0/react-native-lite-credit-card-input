@@ -1,6 +1,6 @@
 const images = {
   unknown: require('./unknown.png'),
-  amex: require('./amex.png'),
+  "american-express": require('./amex.png'),
   visa: require('./visa.png'),
   mastercard: require('./mastercard.png'),
   discover: require('./discover.png'),

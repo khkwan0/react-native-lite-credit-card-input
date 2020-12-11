@@ -1,5 +1,7 @@
+import React from 'react'
+import {View, TextInput, Image} from 'react-native'
+import valid from 'card-validator'
 import Images from './images/index'
-import moment from 'moment'
 
 // the regular expressions check for possible matches as you type, hence the OR operators based on the number of chars
 // regexp string length {0} provided for soonest detection of beginning of the card numbers this way it could be used for BIN CODE detection also
@@ -19,223 +21,169 @@ const maestro_regex = new RegExp('^(5[06789]|6)[0-9]{0,}$'); //always growing in
 const discover_regex = new RegExp('^(6011|65|64[4-9]|62212[6-9]|6221[3-9]|622[2-8]|6229[01]|62292[0-5])[0-9]{0,}$')
 ////6011, 622126-622925, 644-649, 65
 
-const card_spaces = new RegExp('.{1,4}','g')
-
 const LiteCreditCardInput = props => {
-  const [rawCC, setRawCC] = React.useState('')
-  const [displayCC, setDisplayCC] = React.useState('')
-  const [numericCvv, setNumericCvv] = React.useState(0)
-  const [exp, setExp] = React.useState('')
-  const [displayExp, setDisplayExp] = React.useState('')
-  const [month, setMonth] = React.useState('')
-  const [year, setYear] = React.useState('')
-  const [cvv, setCvv] = React.useState('')
-  const [brand, setBrand] = React.useState('unknown')
-  const [valid, setValid] = React.useState(false)
-  const [validExp, setValidExp] = React.useState(false)
-  const [validCvv, setValidCvv] = React.useState(false)
-  const [showNumberInput, setShowNumberInput] = React.useState(true)
-  const [showExpCVC, setShowExpCVC] = React.useState(false)
 
+  const [brand, setBrand] = React.useState('unknown')
+  const [cardNumber, setCardNumber] = React.useState('')
+  const [displayNumber, setDispayNumber] = React.useState('')
+  const [numberValidity, setNumberValidity] = React.useState(null)
+
+  const [showNumberInput, setShowNumberInput] = React.useState(true)
+  const [showExpCVV, setShowExpCVV] = React.useState(false)
+
+  const [exp, setExp] = React.useState('')
+  const [expValidity, setExpValidity] = React.useState(null)
+  const [displayExp, setDisplayExp] = React.useState('')
+  const [cvv, setCvv] = React.useState('')
+  const [cvvValidity, setCvvValidity] = React.useState(null)
+
+  const numInp = React.useRef(null)
   const expInp = React.useRef(null)
   const cvvInp = React.useRef(null)
-  const numInp = React.useRef(null)
 
   React.useEffect(() => {
-    CheckEntire()
-  }, [validCvv])
-
-  React.useEffect(() => {
-    try {
-      const _numericCvv = parseInt(cvv)
-      setNumericCvv(_numericCvv)
-      if (_numericCvv > 99 && _numericCvv < 10000) {
-        setValidCvv(true)
-      } else {
-        setValidCvv(false)
-      }
-    } catch(e) {
-      console.log(e)
-      setValidCvv(false)
+    if (showExpCVV) {
+      expInp.current.focus()
     }
-  }, [cvv])
+  }, [showExpCVV])
+
+  React.useEffect(() => {
+    const rawNumber = cardNumber.split(' ').join('')
+    const res = valid.number(rawNumber)
+    let toDisplay = ''
+    if (res.card !== null) {
+      let i = 0
+      while (i < rawNumber.length) {
+        if (res.card.gaps.includes(i)) {
+          toDisplay += ' ' 
+        }
+        toDisplay += rawNumber[i]
+        i++
+      }
+    } else {
+      toDisplay = cardNumber
+    }
+    setDispayNumber(toDisplay)
+    setNumberValidity({...res})
+    if (res.isPotentiallyValid && res.card !== undefined && res.card && res.card.type !== undefined && res.card.type) {
+      setBrand(res.card.type)
+    } else {
+      setBrand('unknown')
+    }
+    if (res.isValid) {
+      setShowExpCVV(true)
+      setShowNumberInput(false)
+    }
+  }, [cardNumber])
 
   React.useEffect(() => {
     if (showNumberInput) {
-      setShowExpCVC(false)
       numInp.current.focus()
-    } else {
-      setShowExpCVC(true)
     }
   }, [showNumberInput])
 
   React.useEffect(() => {
-    if (expInp.current) {
-      expInp.current.focus()
+    let rawExp = exp.split('/').join('')
+    const res = valid.expirationDate(rawExp)
+    if (rawExp) {
+      rawExp = rawExp.match(new RegExp('.{1,2}', 'g')).join('/')
     }
-  }, [showExpCVC])
-
-  React.useEffect(() => {
-    CheckEntire()
-  }, [validExp])
-
-  React.useEffect(() => {
-    let formattedText = exp.split('/').join('')
-    if (formattedText.length === 4) {
-      const month = Math.floor(parseInt(formattedText)/100)
-      const year = parseInt(formattedText)%100 + 2000
-      const expEpoch = moment().set({'year': year, 'month': month, 'date':1, 'hour': 0, 'minute': 0, 'seconds': 0, 'milliseconds': 0}).format('x')
-      if (Date.now() < expEpoch) { 
-        setMonth(month)
-        setYear(year)
-        setValidExp(true)
-        cvvInp.current.focus()
-      } else {
-        setMonth(month)
-        setYear(year)
-        setValidExp(false)
-      }
+    if (rawExp.length !== 5) {
+      res.isValid = false
+      res.isPotentiallyValid = false
     }
-    if (formattedText.length > 0) {
-      formattedText = formattedText.match(new RegExp('.{1,2}', 'g')).join('/');
+    setExpValidity({...res})
+    setDisplayExp(rawExp)
+    if (res.isValid) {
+      cvvInp.current.focus()
     }
-    setDisplayExp(formattedText)
   }, [exp])
 
   React.useEffect(() => {
-    let formattedText = rawCC.split(' ').join('')
-    let cc_brand = brand
-    if (brand === 'unknown') {
-      cc_brand = getBrand(formattedText)
-      setBrand(cc_brand)
+    let cvvLength = 3 
+    if (numberValidity !== null && numberValidity.card !== undefined && numberValidity.card.type !== undefined && numberValidity.card.type === 'american-express') {
+      cvvLength = 4
     }
-    if (((cc_brand === 'visa' || cc_brand === 'mastercard') && formattedText.length === 16) || (cc_brand === 'amex' && formattedText.length === 13)) {
-      if (isValidNumber(formattedText)) {
-        setValid(true)
-        setShowNumberInput(false)
-        setShowExpCVC(true)
-      } else {
-        setValid(false)
-      }
-    }
-    if (formattedText.length > 0) {
-      formattedText = formattedText.match(card_spaces).join(' ');
-    }
-    setDisplayCC(formattedText)
-    CheckEntire()
-  }, [rawCC])
+    const res = valid.cvv(cvv, cvvLength)
+    console.log(res)
+    setCvvValidity({...res})
+  }, [cvv])
 
-  const isValidNumber = cardNumber => {
-    cardNumber = cardNumber.trim()
-    let i = cardNumber.length - 1
-    let total = 0
-    let double = false
-    while (i >= 0) {
-      if (double) {
-        let val = parseInt(cardNumber[i]) * 2
-        if (val > 9) {
-          const toAdd = Math.floor(val/10) + val%10
-          total += toAdd
-        } else {
-          total += val
-        }
-      } else {
-        total += parseInt(cardNumber[i])
-      }
-      double = !double
-      i--
-    }
-    let valid = false
-    if (total%10 === 0) {
-      valid = true
-    }
-    return valid
-  }
+  React.useEffect(() => {
+    HandleChange()
+  }, [numberValidity, expValidity, cvvValidity])
 
-  const CheckEntire = () => {
-    let _valid = false
-    if (valid && validExp && validCvv) {
-      _valid = true
-    }
-    props.onChange({
-      valid: _valid,
+  const HandleChange = () => {
+    const res = {
+      valid: false,
+      type: 'unknown',
       values: {
-        number: rawCC.split(' ').join(''),
-        expiry: displayExp,
-        cvc: numericCvv
-      }
-    })
-  }
-
-  const getBrand = cur_val => {
-    // get rid of anything but numbers
-    cur_val = cur_val.replace(/\D/g, '')
-
-    // checks per each, as their could be multiple hits
-    //fix: ordering matter in detection, otherwise can give false results in rare cases
-    var sel_brand = "unknown"
-    if (cur_val.match(jcb_regex)) {
-      sel_brand = "jcb"
-    } else if (cur_val.match(amex_regex)) {
-      sel_brand = "amex"
-    } else if (cur_val.match(diners_regex)) {
-      sel_brand = "diners_club"
-    } else if (cur_val.match(visa_regex)) {
-      sel_brand = "visa"
-    } else if (cur_val.match(mastercard_regex)) {
-      sel_brand = "mastercard"
-    } else if (cur_val.match(discover_regex)) {
-      sel_brand = "discover"
-    } else if (cur_val.match(maestro_regex)) {
-      if (cur_val[0] == '5') { //started 5 must be mastercard
-          sel_brand = "mastercard"
-      } else {
-         sel_brand = "maestro" //maestro is all 60-69 which is not something else, thats why this condition in the end
+        number: cardNumber.split(' ').join(''),
+        expiry: exp,
+        cvc: cvv
       }
     }
-    return sel_brand
+    console.log(cvvValidity)
+    if (numberValidity && numberValidity.isValid && expValidity && expValidity.isValid && cvvValidity && cvvValidity.isValid) {
+      res.valid = true
+    }
+    if (numberValidity !== null && numberValidity.card !== undefined && numberValidity.card && numberValidity.card.type !== undefined && numberValidity.card.type) {
+      res.type = numberValidity.card.type
+    }
+    props.onChange({...res})
   }
 
-  return(
-    <View style={{flexDirection:'row', backgroundColor:'white', borderRadius: 5, alignItems:'center'}}>
-      <View style={{flexGrow:1}}>
-        {showNumberInput && 
+  return (
+    <View style={[{flexDirection: 'row', backgroundColor: 'white', borderRadius: 5, alignItems:'center'},(props.style !== undefined && props.style)?{...props.style}:{}]}>
+      <View style={{flexGrow: 1}}>
+        {showNumberInput &&
           <TextInput
+            style={
+              [{color: (numberValidity !== null)?numberValidity.isValid?'green':numberValidity.isPotentiallyValid?'black':'red':'black'}]
+            }
             label="Card Number"
             keyboardType="numeric"
             placeholder="1234 1234 1234 1234"
-            value={displayCC}
-            onChangeText={text=>setRawCC(text)}
+            value={displayNumber}
+            onChangeText={text=>setCardNumber(text)}
+            onFocus={()=>setShowNumberInput(true)}
             ref={numInp}
           />
         }
-        {showExpCVC &&
+        {showExpCVV &&
           <View style={{flexDirection: 'row'}}>
             <View style={{flex: 1}}>
               <TextInput
                 style={[props.inputStyle!==undefined?props.inputStyle:{},{color: valid?props.validColor!==undefined?props.validColor:'green':props.invalidColor!==undefined?props.invalidColor:'red'} ]}
-                value={"..."+displayCC.slice(-4)}
-                onFocus={()=>setShowNumberInput(true)}
+                value={"..."+displayNumber.slice(-4)}
+                onFocus={()=>{setShowNumberInput(true); setShowExpCVV(false)}}
               />
             </View>
             <View style={{flex: 1}}>
               <TextInput
+              style={
+                [{color: (expValidity !== null)?expValidity.isValid?'green':expValidity.isPotentiallyValid?'black':'red':'black'}]
+              }
                 ref={expInp}
                 value={displayExp}
                 onChangeText={text=>setExp(text)}
                 placeholder="MM/YY"
                 keyboardType="numeric"
                 label="Expiration Date"
-              />
+                maxLength={5}
+              />              
             </View>
             <View style={{flex: 1}}>
               <TextInput
+                style={
+                  [{color: (cvvValidity !== null)?cvvValidity.isValid?'green':cvvValidity.isPotentiallyValid?'black':'red':'black'}]
+                }
                 ref={cvvInp}
                 value={cvv}
                 onChangeText={text=>setCvv(text)}
-                placeholder="CVV"
+                placeholder={(numberValidity && numberValidity.card !== undefined && numberValidity.card.code !== undefined && numberValidity.card.code.name !== undefined)?numberValidity.card.code.name:'CVV'}
                 keyboardType="numeric"
-                label="CVV"
+                maxLength={(numberValidity && numberValidity.card !== undefined && numberValidity.card.code !== undefined && numberValidity.card.code.size !== undefined)?numberValidity.card.code.size:3}
               />
             </View>
           </View>
