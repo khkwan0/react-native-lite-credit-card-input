@@ -1,7 +1,7 @@
 import React from 'react'
 import {View, TextInput, Image} from 'react-native'
 import valid from 'card-validator'
-import Images from './images/index'
+import Images from '../images/index'
 
 const LiteCreditCardInput = props => {
 
