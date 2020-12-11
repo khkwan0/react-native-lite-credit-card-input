@@ -24,12 +24,9 @@ npm install react-native-lite-credit-card-input
  <tr><th>Prop</th><th></th></tr>
  <tr><td>onChange</td><td>Returns a card object * see below</td></tr>
 </table>
+
 # Usage
-
 import {LiteCreditCardInput} from 'react-native-lite-credit-card-input'
-
-props:
- onChange(card) - required
  
  card's structure:
  
